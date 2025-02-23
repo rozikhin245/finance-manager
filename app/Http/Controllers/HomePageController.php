@@ -15,6 +15,7 @@ class HomePageController extends Controller
         $totalIncome = Transaction::where('user_id', $userId)->where('type', 'income')->sum('amount');
         $totalExpense = Transaction::where('user_id', $userId)->where('type', 'expense')->sum('amount');
         $balance = $totalIncome - $totalExpense;
+        $sama = $balance;
 
         // Ambil transaksi terbaru (5 terakhir)
         $recentTransactions = Transaction::where('user_id', $userId)
@@ -28,6 +29,6 @@ class HomePageController extends Controller
             ->groupBy('year', 'month', 'type')
             ->get();
 
-        return view('HomePage.index', compact('totalIncome', 'totalExpense', 'balance', 'recentTransactions', 'monthlyData'));
+        return view('HomePage.index', compact('totalIncome', 'totalExpense', 'balance', 'recentTransactions', 'monthlyData','sama'));
     }
 }

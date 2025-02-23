@@ -6,14 +6,7 @@
             width: 100%
         }
     </style>
-    <div class="container mx-auto p-6">
-        <!-- Header -->
-        <x-slot name="header">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Riwayat Keuangan Anda') }}
-            </h2>
-        </x-slot>    
-        
+    <div class="container mx-auto p-6">        
         <!-- Form Filter -->
         <div class="bg-white p-6 rounded-lg shadow-md koko">
             <h3 class="text-lg font-semibold mb-4">Filter Transaksi</h3>
@@ -57,71 +50,49 @@
                 <table class="table table-striped">
                     <thead class="bg-gray-200">
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Kategori</th>
-                            <th>Jenis</th>
-                            <th>Jumlah</th>
+                            <th class="text-center">Tanggal</th>
+                            <th class="text-center">Kategori</th>
+                            <th class="text-center">Jenis</th>
+                            <th class="text-center">Jumlah</th>
+                            <th class="text-center">aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($transactions as $transaction)
                             <tr>
-                                <td>{{ $transaction->date }}</td>
-                                <td>{{ $transaction->category }}</td>
-                                <td>
+                                <td class="text-center">{{ $transaction->date }}</td>
+                                <td class="text-center">{{ $transaction->category }}</td>
+                                <td class="text-center">
                                     <span class="badge {{ $transaction->type == 'income' ? 'bg-success' : 'bg-danger' }}">
                                         {{ ucfirst($transaction->type) }}
                                     </span>
-                                </td>
+                                </td class="text-center">
                                 <td>Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
+                                <td class="text-center">
+                                    <!-- Dropdown Button -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i data-feather="more-horizontal"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('transactions.edit', $transaction->id) }}">Edit</a>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item text-danger">Hapus</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
-
-
-
-
-
-    <div class="container">
-        <h2>Daftar Transaksi</h2>
-
-    
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-    
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Jenis</th>
-                    <th>Kategori</th>
-                    <th>Jumlah</th>
-                    <th>Tanggal</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($transactions as $transaction)
-                    <tr>
-                        <td>{{ ucfirst($transaction->type) }}</td>
-                        <td>{{ $transaction->category }}</td>
-                        <td>Rp{{ number_format($transaction->amount, 2) }}</td>
-                        <td>{{ $transaction->date }}</td>
-                        <td>
-                            <a href="{{ route('transactions.edit', $transaction->id) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
     </div>
 </x-app-layout>

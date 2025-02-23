@@ -18,8 +18,9 @@ class SavingTargetController extends Controller
         $totalIncome = Transaction::where('user_id', $userId)->where('type', 'income')->sum('amount');
         $totalExpense = Transaction::where('user_id', $userId)->where('type', 'expense')->sum('amount');
         $balance = $totalIncome - $totalExpense;
+        $sama = $balance;
 
 
-        return view('saving-targets.index', compact('targets', 'balance', 'totalIncome'));
+        return view('saving-targets.index', compact('targets', 'balance', 'totalIncome', 'sama'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,8 @@ class TransactionController extends Controller
             }
         }
     
-        $transactions = $query->orderBy('date', 'desc')->get();
+        $transactions = $query->orderBy('id', 'desc')->get();
+        
     
         return view('transactions.index', compact('transactions'));
     }
@@ -53,32 +55,40 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
+        // Validasi input
         $request->validate([
-            'type' => 'required|in:income,expense',
-            'category' => 'required|string|max:100',
-            'amount' => 'required|numeric|min:0',
-            'date' => 'required|date',
+            'type' => 'required|string',
+            'category' => 'required|string',
+            'other_category' => 'nullable|string',
+            'amount' => 'required|numeric',
             'description' => 'nullable|string',
         ]);
 
+        // Jika kategori yang dipilih adalah "other", gunakan nilai dari input "other_category"
+        $category = ($request->category === 'other' && !empty($request->other_category))
+            ? $request->other_category
+            : $request->category;
+
+        // Simpan transaksi ke database dengan tanggal otomatis
         Transaction::create([
-            'user_id' => Auth::id(),
+            'user_id' => auth()->id(), // Ambil ID pengguna yang sedang login
             'type' => $request->type,
-            'category' => $request->category,
+            'category' => $category,
             'amount' => $request->amount,
-            'date' => $request->date,
+            'date' => Carbon::now(), // Otomatis menggunakan waktu saat ini
             'description' => $request->description,
         ]);
 
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Transaksi berhasil ditambahkan!');
     }
+    
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
-        //
+
     }
 
     /**
@@ -118,7 +128,7 @@ class TransactionController extends Controller
         $transaction = Transaction::findOrFail($id);
         $transaction->delete();
     
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus.');
+        return redirect()->back()->with('success', 'Transaksi berhasil dihapus.');
     }
     
 }
